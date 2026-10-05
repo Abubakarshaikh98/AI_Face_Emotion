@@ -588,27 +588,43 @@ def stats():
 
     if os.path.exists(known_faces_path):
         for person_name in os.listdir(known_faces_path):
-            person_folder = os.path.join(known_faces_path, person_name)
+            person_folder = os.path.join(
+                known_faces_path,
+                person_name
+            )
 
             if os.path.isdir(person_folder):
                 total_people += 1
+
+    # Sirf currently registered people
+    registered = get_registered_names()
 
     present_today = set()
     today = pakistan_now().strftime("%Y-%m-%d")
 
     if os.path.exists(attendance_file):
-        with open(attendance_file, "r", newline="") as file:
+        with open(
+            attendance_file,
+            "r",
+            newline=""
+        ) as file:
+
             reader = csv.DictReader(file)
 
             for row in reader:
-                if row.get("Date") == today:
-                    present_today.add(row.get("Name"))
+
+                if (
+                    row.get("Date") == today
+                    and row.get("Name") in registered
+                ):
+                    present_today.add(
+                        row.get("Name")
+                    )
 
     return {
         "total_people": total_people,
         "present_today": len(present_today)
     }
-
 # =========================================================
 # PEOPLE API
 # =========================================================
