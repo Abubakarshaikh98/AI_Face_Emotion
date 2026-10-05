@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AI Face Attendance System</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+
+<body>
+
+    <div class="dashboard">
+
+
+        <!-- =========================
+             SIDEBAR
+        ========================== -->
+
+        <aside class="sidebar">
+
+            <h2>AI Face AI</h2>
+
+            <nav>
+
+                <a href="#" class="active">
+                    Dashboard
+                </a>
+
+                <a href="#attendance">
+                    Attendance
+                </a>
+
+                <a href="#people">
+                    People
+                </a>
+
+                <button
+                    onclick="window.location.href='/logout'"
+                    class="logout-btn"
+                >
+                    Logout
+                </button>
+
+            </nav>
+
+        </aside>
+
+
+
+        <!-- =========================
+             MAIN CONTENT
+        ========================== -->
+
+        <main class="main-content">
+
+
+            <header>
+
+                <h1>
+                    Face Recognition Dashboard
+                </h1>
+
+                <p>
+                    AI-powered attendance and emotion detection
+                </p>
+
+            </header>
+
+
+
+            <!-- =========================
+                 STATS
+            ========================== -->
+
+            <section class="stats">
+
+
+                <div class="card">
+
+                    <h3>
+                        Total People
+                    </h3>
+
+                    <p id="total-people">
+                        0
+                    </p>
+
+                </div>
+
+
+
+                <div class="card">
+
+                    <h3>
+                        Present Today
+                    </h3>
+
+                    <p id="present-today">
+                        0
+                    </p>
+
+                </div>
+
+
+
+                <div class="card">
+
+                    <h3>
+                        System Status
+                    </h3>
+
+                    <p class="online">
+                        Online
+                    </p>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =========================
+                 CAMERA + RESULT
+            ========================== -->
+
+            <section class="content-grid">
+
+
+                <!-- CAMERA -->
+
+                <div class="camera-card">
+
+                    <h2>
+                        Live Camera
+                    </h2>
+
+
+                    <div class="camera-placeholder">
+
+                        <img
+                            src="{{ url_for('video') }}"
+                            alt="Live Camera"
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RECOGNITION RESULT -->
+
+                <div class="info-card">
+
+                    <h2>
+                        Recognition Result
+                    </h2>
+
+
+                    <div class="info-row">
+
+                        <span>
+                            Name
+                        </span>
+
+                        <strong id="name">
+                            Waiting...
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="info-row">
+
+                        <span>
+                            Emotion
+                        </span>
+
+                        <strong id="emotion">
+                            Waiting...
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="info-row">
+
+                        <span>
+                            Status
+                        </span>
+
+                        <strong
+                            id="status"
+                            class="present"
+                        >
+                            Waiting...
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =========================
+     ATTENDANCE SUMMARY
+========================== -->
+
+<section class="summary-card">
+
+    <div class="summary-header">
+
+        <h2>
+            Attendance Summary
+        </h2>
+
+        <span id="summary-date">
+            Today
+        </span>
+
+    </div>
+
+
+    <div class="summary-grid">
+
+
+        <div class="summary-item">
+
+            <h3>
+                Total People
+            </h3>
+
+            <p id="summary-total">
+                0
+            </p>
+
+        </div>
+
+
+
+        <div class="summary-item">
+
+            <h3>
+                Present
+            </h3>
+
+            <p
+                id="summary-present"
+                class="summary-number present-number"
+            >
+                0
+            </p>
+
+            <span class="summary-badge present-badge">
+                Present
+            </span>
+
+        </div>
+
+
+        <div class="summary-item">
+
+            <h3>
+                Absent
+            </h3>
+
+            <p
+                id="summary-absent"
+                class="summary-number absent-number"
+            >
+                0
+            </p>
+
+            <span class="summary-badge absent-badge">
+                Absent
+            </span>
+
+        </div>
+
+
+        <div class="summary-item">
+
+            <h3>
+                Attendance
+            </h3>
+
+            <p id="summary-percentage">
+                0%
+            </p>
+
+        <div class="progress-container">
+
+            <div
+                id="attendance-progress"
+                class="progress-bar"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    </div>
+
+</div>
+
+    </div>
+
+</section>
+
+
+            <!-- =========================
+                 ATTENDANCE TABLE
+            ========================== -->
+
+            <section class="attendance-card" id="attendance">
+
+                <div class="attendance-header">
+
+                    <h2 id="attendance-title">
+                        Today's Attendance
+                    </h2>
+
+                    <input
+                        type="date"
+                        id="attendance-date"
+                        onchange="updateAttendance()"
+            >
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Name
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Time
+                                </th>
+
+                                <th>
+                                    Emotion
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="attendance-body">
+
+                            <tr>
+
+                                <td colspan="4">
+                                    Loading attendance...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+
+                    </table>
+
+                </div>
+
+            </section>
+
+            <!-- =========================
+     ATTENDANCE HISTORY
+========================== -->
+
+<section
+    class="attendance-history-card"
+    id="attendance-history"
+>
+
+    <div class="attendance-history-header">
+
+        <h2>
+            Attendance History
+        </h2>
+
+        <input
+            type="date"
+            id="history-date"
+        >
+
+        <a
+            href="/export-attendance"
+            class="export-attendance-btn"
+        >
+            Export CSV
+        </a>
+
+    </div>
+
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Name
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Emotion
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="history-body">
+
+                <tr>
+
+                    <td colspan="4">
+                        Select a date to view attendance.
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<!-- =========================
+     ATTENDANCE ANALYTICS
+========================== -->
+
+<section
+    class="analytics-card"
+    id="analytics"
+>
+
+    <div class="analytics-header">
+
+        <h2>
+            Attendance Analytics
+        </h2>
+
+    </div>
+
+
+    <div class="chart-container">
+
+        <canvas
+            id="attendance-chart"
+        ></canvas>
+
+    </div>
+
+    <div class="chart-container">
+
+        <canvas
+            id="emotion-chart"
+        ></canvas>
+
+    </div>
+
+</section>
+
+            <!-- =========================
+     PEOPLE SECTION
+========================== -->
+
+<section class="people-card" id="people">
+
+    <div class="people-header">
+        <!-- =========================
+     ADD PERSON FORM
+========================== -->
+
+<div class="add-person-form">
+
+    <h3>
+        Add New Person
+    </h3>
+
+    <form
+        id="add-person-form"
+        enctype="multipart/form-data"
+    >
+
+        <input
+            type="text"
+            id="person-name"
+            name="name"
+            placeholder="Enter person name"
+            required
+        >
+
+        <input
+            type="file"
+            id="person-image"
+            name="image"
+            accept="image/*"
+            required
+        >
+
+        <button
+            type="submit"
+        >
+            Add Person
+        </button>
+
+    </form>
+
+    <p id="add-person-message"></p>
+
+</div>
+
+        <h2>
+            Registered People
+        </h2>
+
+        <span id="people-count">
+            0 People
+        </span>
+
+    </div>
+
+    <!-- Search People -->
+
+<div class="people-search">
+
+    <input
+        type="text"
+        id="people-search-input"
+        placeholder="Search person..."
+    >
+
+</div>
+
+
+    <div
+        class="people-grid"
+        id="people-grid"
+    >
+
+        <div class="people-loading">
+            Loading people...
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     PERSON DETAILS
+========================== -->
+
+<section
+    class="person-details-card"
+    id="person-details"
+    style="display: none;"
+>
+
+    <div class="person-details-header">
+
+        <h2>
+            Person Details
+        </h2>
+
+        <button
+            onclick="closePersonDetails()"
+        >
+            Close
+        </button>
+
+    </div>
+
+
+    <div class="person-details-content">
+
+        <div class="person-details-icon">
+            👤
+        </div>
+
+
+        <div class="person-details-info">
+
+            <h3 id="details-name">
+                -
+            </h3>
+
+            <span
+                id="details-status"
+                class="registered-badge"
+            >
+                Registered
+            </span>
+
+            <p>
+                Present Days:
+                <strong id="details-present">
+                    0
+                </strong>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="person-emotions">
+
+        <h3>
+            Recorded Emotions
+        </h3>
+
+        <div id="details-emotions">
+            No emotions recorded.
+        </div>
+
+    </div>
+
+</section>
+
+
+        </main>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script>
+
+
+        // =========================================
+        // UPDATE RECOGNITION
+        // =========================================
+
+        async function updateStatus() {
+
+            try {
+
+                const response =
+                    await fetch("/status");
+
+
+                const data =
+                    await response.json();
+
+
+                document.getElementById(
+                    "name"
+                ).textContent =
+                    data.name;
+
+
+                document.getElementById(
+                    "emotion"
+                ).textContent =
+                    data.emotion;
+
+
+                document.getElementById(
+                    "status"
+                ).textContent =
+                    data.status;
+
+            }
+
+            catch (error) {
+
+                console.log(
+                    "Status update error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+
+        // =========================================
+        // UPDATE STATS
+        // =========================================
+
+        async function updateStats() {
+
+            try {
+
+                const response =
+                    await fetch("/stats");
+
+
+                const data =
+                    await response.json();
+
+
+                document.getElementById(
+                    "total-people"
+                ).textContent =
+                    data.total_people;
+
+
+                document.getElementById(
+                    "present-today"
+                ).textContent =
+                    data.present_today;
+
+            }
+
+            catch (error) {
+
+                console.log(
+                    "Stats update error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        // =========================================
+// UPDATE ATTENDANCE SUMMARY
+// =========================================
+
+async function updateAttendanceSummary() {
+
+    try {
+
+        const dateInput =
+            document.getElementById("attendance-date");
+
+        let selectedDate = dateInput.value;
+
+        // Default = today's date
+        if (!selectedDate) {
+
+            const today =
+                new Date();
+
+            selectedDate =
+                today.toISOString().split("T")[0];
+
+            dateInput.value =
+                selectedDate;
+        }
+
+
+        const response =
+            await fetch(
+                `/attendance-summary?date=${selectedDate}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            "summary-total"
+        ).textContent =
+            data.total_people;
+
+
+        document.getElementById(
+            "summary-present"
+        ).textContent =
+            data.present;
+
+
+        document.getElementById(
+            "summary-absent"
+        ).textContent =
+            data.absent;
+
+
+        document.getElementById(
+            "summary-percentage"
+        ).textContent =
+            data.percentage + "%";
+
+        document.getElementById(
+            "attendance-progress"
+        ).style.width =
+            data.percentage + "%";
+
+
+        document.getElementById(
+            "summary-date"
+        ).textContent =
+            selectedDate;
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Attendance summary error:",
+            error
+        );
+
+    }
+
+}
+
+// =========================================
+// ATTENDANCE CHART
+// =========================================
+
+let attendanceChart = null;
+
+
+async function updateAttendanceChart() {
+
+    try {
+
+        const dateInput =
+            document.getElementById(
+                "attendance-date"
+            );
+
+        let selectedDate =
+            dateInput.value;
+
+
+        // Default = today's date
+        if (!selectedDate) {
+
+            const today =
+                new Date();
+
+            selectedDate =
+                today
+                    .toISOString()
+                    .split("T")[0];
+
+        }
+
+
+        const response =
+            await fetch(
+                `/attendance-summary?date=${selectedDate}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        const chart =
+            document.getElementById(
+                "attendance-chart"
+            );
+
+
+        // Destroy old chart
+        if (attendanceChart) {
+
+            attendanceChart.destroy();
+
+        }
+
+
+        attendanceChart =
+            new Chart(
+                chart,
+                {
+                    type: "doughnut",
+
+                    data: {
+
+                        labels: [
+                            "Present",
+                            "Absent"
+                        ],
+
+                        datasets: [
+                            {
+                                data: [
+                                    data.present,
+                                    data.absent
+                                ]
+                            }
+                        ]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        plugins: {
+
+                            legend: {
+                                position: "bottom"
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Attendance chart error:",
+            error
+        );
+
+    }
+
+}
+        // =========================================
+// UPDATE ATTENDANCE TABLE
+// =========================================
+
+async function updateAttendance() {
+
+    try {
+
+        const dateInput =
+            document.getElementById("attendance-date");
+
+        let selectedDate = dateInput.value;
+
+        // Default = today's date
+        if (!selectedDate) {
+
+            const today =
+                new Date();
+
+            selectedDate =
+                today.toISOString().split("T")[0];
+
+            dateInput.value =
+                selectedDate;
+        }
+
+
+        const response =
+            await fetch(
+                `/attendance?date=${selectedDate}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        const tableBody =
+            document.getElementById(
+                "attendance-body"
+            );
+
+
+        tableBody.innerHTML = "";
+
+
+        if (data.length === 0) {
+
+            tableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="4">
+                        No attendance records for ${selectedDate}
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+        }
+
+
+        data.forEach(record => {
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${record.Name}
+                </td>
+
+                <td>
+                    ${record.Date}
+                </td>
+
+                <td>
+                    ${record.Time}
+                </td>
+
+                <td>
+
+                    <span
+                        class="emotion-badge ${record.Emotion.toLowerCase()}"
+                    >
+                        ${record.Emotion}
+                    </span>
+
+                </td>
+
+            `;
+
+
+            tableBody.appendChild(row);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Attendance update error:",
+            error
+        );
+
+    }
+
+}
+
+// =========================================
+// EMOTION ANALYSIS CHART
+// =========================================
+
+let emotionChart = null;
+
+
+async function updateEmotionChart() {
+
+    try {
+
+        const response =
+            await fetch("/emotion-summary");
+
+
+        const data =
+            await response.json();
+
+
+        const chart =
+            document.getElementById(
+                "emotion-chart"
+            );
+
+
+        // Destroy old chart
+        if (emotionChart) {
+
+            emotionChart.destroy();
+
+        }
+
+
+        emotionChart =
+            new Chart(
+                chart,
+                {
+                    type: "bar",
+
+                    data: {
+
+                        labels: [
+                            "Angry",
+                            "Disgust",
+                            "Fear",
+                            "Happy",
+                            "Sad",
+                            "Surprise",
+                            "Neutral"
+                        ],
+
+                        datasets: [
+                            {
+                                label: "Emotion Count",
+
+                                data: [
+                                    data.angry,
+                                    data.disgust,
+                                    data.fear,
+                                    data.happy,
+                                    data.sad,
+                                    data.surprise,
+                                    data.neutral
+                                ]
+                            }
+                        ]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        scales: {
+
+                            y: {
+                                beginAtZero: true
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Emotion chart error:",
+            error
+        );
+
+    }
+
+}
+// =========================================
+// UPDATE PEOPLE
+// =========================================
+
+async function updatePeople() {
+
+    try {
+
+        const response =
+            await fetch("/people");
+
+        const data =
+            await response.json();
+
+
+        const peopleGrid =
+            document.getElementById(
+                "people-grid"
+            );
+
+
+        const peopleCount =
+            document.getElementById(
+                "people-count"
+            );
+
+
+        peopleGrid.innerHTML = "";
+
+
+        // =========================================
+        // SEARCH
+        // =========================================
+
+        const searchInput =
+            document.getElementById(
+                "people-search-input"
+            );
+
+
+        const searchText =
+            searchInput.value
+                .toLowerCase()
+                .trim();
+
+
+        // Filter people
+        const filteredPeople =
+            data.filter(person =>
+                person.name
+                    .toLowerCase()
+                    .includes(searchText)
+            );
+
+
+        // Update count
+        peopleCount.textContent =
+            `${filteredPeople.length} People`;
+
+
+        // No results
+        if (
+            filteredPeople.length === 0
+        ) {
+
+            peopleGrid.innerHTML = `
+
+                <div class="people-loading">
+
+                    ${
+                        searchText
+                            ? "No matching people found."
+                            : "No registered people found."
+                    }
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        // =========================================
+        // CREATE PEOPLE CARDS
+        // =========================================
+
+        filteredPeople.forEach(
+            person => {
+
+                const personCard =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                personCard.className =
+                    "person-card";
+
+
+                personCard.style.cursor =
+                    "pointer";
+
+
+                personCard.innerHTML = `
+
+                    <div class="person-icon">
+                        👤
+                    </div>
+
+                    <div class="person-info">
+
+                        <h3>
+                            ${person.name}
+                        </h3>
+
+                        <span class="registered-badge">
+                            ${person.status}
+                        </span>
+
+                        <button
+                            class="delete-person-btn"
+                            type="button"
+                        >
+                            Delete
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                // =========================================
+                // PERSON DETAILS
+                // =========================================
+
+                personCard.addEventListener(
+                    "click",
+                    function() {
+
+                        showPersonDetails(
+                            person.name
+                        );
+
+                    }
+                );
+
+
+                // =========================================
+                // DELETE PERSON
+                // =========================================
+
+                const deleteButton =
+                    personCard.querySelector(
+                        ".delete-person-btn"
+                    );
+
+
+                deleteButton.addEventListener(
+                    "click",
+                    async function(event) {
+
+                        event.stopPropagation();
+
+
+                        const confirmed =
+                            confirm(
+                                `Are you sure you want to delete ${person.name}?`
+                            );
+
+
+                        if (!confirmed) {
+                            return;
+                        }
+
+
+                        try {
+
+                            const response =
+                                await fetch(
+                                    `/delete-person/${encodeURIComponent(person.name)}`,
+                                    {
+                                        method: "DELETE"
+                                    }
+                                );
+
+
+                            const data =
+                                await response.json();
+
+
+                            if (data.success) {
+
+                                alert(
+                                    data.message
+                                );
+
+                                updatePeople();
+
+                            }
+                            else {
+
+                                alert(
+                                    data.message
+                                );
+
+                            }
+
+                        }
+
+                        catch (error) {
+
+                            console.log(
+                                "Delete person error:",
+                                error
+                            );
+
+                            alert(
+                                "Something went wrong."
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                peopleGrid.appendChild(
+                    personCard
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "People update error:",
+            error
+        );
+
+    }
+
+}
+// =========================================
+// UPDATE ATTENDANCE HISTORY
+// =========================================
+
+async function updateAttendanceHistory() {
+
+    try {
+
+        const dateInput =
+            document.getElementById(
+                "history-date"
+            );
+
+        let selectedDate =
+            dateInput.value;
+
+
+        // Default = today's date
+        if (!selectedDate) {
+
+            const today =
+                new Date();
+
+            selectedDate =
+                today
+                    .toISOString()
+                    .split("T")[0];
+
+            dateInput.value =
+                selectedDate;
+
+        }
+
+
+        const response =
+            await fetch(
+                `/attendance?date=${selectedDate}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        const historyBody =
+            document.getElementById(
+                "history-body"
+            );
+
+
+        historyBody.innerHTML = "";
+
+
+        // No records
+        if (data.length === 0) {
+
+            historyBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="4">
+                        No attendance records for ${selectedDate}
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        // Show records
+        data.forEach(
+            record => {
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${record.Name}
+                    </td>
+
+                    <td>
+                        ${record.Date}
+                    </td>
+
+                    <td>
+                        ${record.Time}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="emotion-badge ${record.Emotion.toLowerCase()}"
+                        >
+                            ${record.Emotion}
+                        </span>
+
+                    </td>
+
+                `;
+
+
+                historyBody.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Attendance history error:",
+            error
+        );
+
+    }
+
+}
+
+
+// =========================================
+// HISTORY DATE CHANGE
+// =========================================
+
+document.getElementById(
+    "history-date"
+).addEventListener(
+    "change",
+    updateAttendanceHistory
+);
+// =========================================
+// ADD PERSON
+// =========================================
+
+document.getElementById(
+    "add-person-form"
+).addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const form =
+            document.getElementById(
+                "add-person-form"
+            );
+
+        const message =
+            document.getElementById(
+                "add-person-message"
+            );
+
+
+        const formData =
+            new FormData(form);
+
+
+        message.textContent =
+            "Adding person...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/add-person",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (data.success) {
+
+                message.textContent =
+                    data.message;
+
+                form.reset();
+
+                updatePeople();
+
+            }
+            else {
+
+                message.textContent =
+                    data.message;
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.log(
+                "Add person error:",
+                error
+            );
+
+            message.textContent =
+                "Something went wrong.";
+
+        }
+
+    }
+);
+// =========================================
+// SHOW PERSON DETAILS
+// =========================================
+
+async function showPersonDetails(name) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/person/${encodeURIComponent(name)}`
+            );
+
+        const data =
+            await response.json();
+
+
+        // Show details section
+        document.getElementById(
+            "person-details"
+        ).style.display = "block";
+
+
+        // Person name
+        document.getElementById(
+            "details-name"
+        ).textContent =
+            data.name;
+
+
+        // Status
+        document.getElementById(
+            "details-status"
+        ).textContent =
+            data.status;
+
+
+        // Present days
+        document.getElementById(
+            "details-present"
+        ).textContent =
+            data.present_days;
+
+
+        // Emotions
+        const emotionsContainer =
+            document.getElementById(
+                "details-emotions"
+            );
+
+
+        emotionsContainer.innerHTML = "";
+
+
+        if (
+            data.emotions.length === 0
+        ) {
+
+            emotionsContainer.textContent =
+                "No emotions recorded.";
+
+        }
+        else {
+
+            data.emotions.forEach(
+                emotion => {
+
+                    const badge =
+                        document.createElement(
+                            "span"
+                        );
+
+                    badge.className =
+                        `emotion-badge ${emotion.toLowerCase()}`;
+
+                    badge.textContent =
+                        emotion;
+
+                    emotionsContainer.appendChild(
+                        badge
+                    );
+
+                }
+            );
+
+        }
+
+
+        // Scroll to details
+        document.getElementById(
+            "person-details"
+        ).scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Person details error:",
+            error
+        );
+
+    }
+
+}
+
+
+        // =========================================
+        // AUTO UPDATE
+        // =========================================
+
+        setInterval(
+            updateStatus,
+            1000
+        );
+
+        setInterval(
+            updateAttendanceSummary,
+            1000
+        );
+
+
+
+
+        setInterval(
+            updateStats,
+            1000
+        );
+
+
+        setInterval(
+            updateAttendance,
+            1000
+        );
+
+        setInterval(
+            updatePeople,
+            3000
+        );
+
+
+
+        // =========================================
+        // RUN IMMEDIATELY
+        // =========================================
+
+        updateStatus();
+
+        updateStats();
+
+        updateAttendance();
+
+        updateAttendanceSummary();
+
+        updatePeople();
+
+        updateAttendanceHistory();
+
+        updateAttendanceChart();
+
+        updateEmotionChart();
+
+
+    </script>
+
+
+
+</body>
+
+</html>

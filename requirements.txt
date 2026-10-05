@@ -1,2 +1,7 @@
+```text
+Flask
 opencv-python
 numpy
+onnxruntime
+pandas
+```

@@ -1,54 +1,92 @@
 # AI Face Recognition, Emotion Detection & Attendance System
 
-A real-time AI-based system that detects faces, recognizes registered people, estimates facial emotions, and automatically records attendance in a CSV file using a webcam.
+An AI-powered **Face Recognition, Emotion Detection, and Attendance Management System** built with Python, OpenCV, Flask, and ONNX deep learning models.
+
+The system recognizes registered people through a webcam, detects their emotions, automatically records attendance, and provides a web-based dashboard for monitoring and analytics.
+
+---
 
 ## Features
 
 * Real-time face detection using **YuNet**
 * Face recognition using **SFace**
 * Recognition of multiple registered people
-* Facial emotion estimation
+* Facial emotion estimation using **MobileFaceNet**
 * Automatic attendance recording
 * Daily duplicate-attendance prevention
 * CSV-based attendance storage
 * Dynamic loading of registered faces from the `known_faces` folder
+* Flask-based web dashboard
+* Admin login authentication
+* Live camera feed
+* Real-time recognition and emotion status
+* Attendance summary with present/absent statistics
+* Attendance history with date filtering
+* CSV attendance export
+* Registered people management
+* Add and delete registered people
+* Individual person attendance and emotion details
+* Attendance analytics and emotion charts
+* Responsive mobile-friendly interface
+* Pakistan timezone support (`Asia/Karachi`)
+
+---
 
 ## Technologies Used
 
 * Python
 * OpenCV
+* Flask
 * NumPy
-* ONNX models
+* Pandas
+* ONNX Runtime
 * YuNet
 * SFace
 * MobileFaceNet
+* HTML
+* CSS
+* JavaScript
+* Chart.js
+* CSV
+
+---
 
 ## Project Structure
 
 ```text
 AI_Face_Emotion/
 │
+├── .vscode/
+│
 ├── attendance/
 │   └── attendance_emotion.csv
 │
 ├── known_faces/
 │   ├── Abubakar/
-│   │   └── 1.jpg
-│   ├── Hamza/
-│   │   └── hamza.jpg
-│   └── Daniyal/
-│       └── 1.jpg
+│   ├── Daniyal/
+│   └── Hamza/
 │
 ├── models/
 │   ├── face_detection_yunet_2026may.onnx
 │   ├── face_recognition_sface_2021dec.onnx
 │   └── facial_expression_recognition_mobilefacenet_2022july.onnx
 │
-├── .vscode/
+├── static/
+│   └── style.css
+│
+├── templates/
+│   ├── index.html
+│   └── login.html
+│
+├── .gitignore
+├── app.py
 ├── attendance_emotion.py
 ├── load_faces.py
+├── README.md
 └── requirements.txt
 ```
+
+---
 
 ## Installation
 
@@ -70,6 +108,32 @@ conda activate faceai
 pip install -r requirements.txt
 ```
 
+### 3. Run the Application
+
+Start the Flask application:
+
+```bash
+python app.py
+```
+
+The application will run at:
+
+```text
+http://127.0.0.1:5000/
+```
+
+Open this address in your web browser to access the **AI Face Recognition Dashboard**.
+
+### 4. Login
+
+The dashboard is protected by admin authentication.
+
+Use the configured admin username and password to log in.
+
+> **Note:** For production deployment, configure the admin credentials and Flask secret key using environment variables.
+
+---
+
 ## Add Registered Faces
 
 Create a separate folder for each person inside `known_faces`.
@@ -78,43 +142,26 @@ Example:
 
 ```text
 known_faces/
+│
 ├── Abubakar/
 │   └── 1.jpg
+│
 ├── Hamza/
 │   └── hamza.jpg
+│
 └── Daniyal/
     └── 1.jpg
 ```
 
-The folder name is used as the person's name.
+The folder name is used as the person's name during face recognition.
 
-## Run the Application
+You can also add and delete registered people directly from the **People** section of the web dashboard.
 
-Activate the environment:
-
-```bash
-conda activate faceai
-```
-
-Then run:
-
-```bash
-python attendance_emotion.py
-```
-
-The webcam will start automatically.
-
-Press:
-
-```text
-Q
-```
-
-to close the application.
+---
 
 ## Attendance
 
-When a registered person is recognized, the system records:
+When a registered person is recognized, the system automatically records:
 
 * Name
 * Date
@@ -133,9 +180,26 @@ Example:
 Name,Date,Time,Emotion
 Abubakar,2026-10-03,04:33:08,sad
 Hamza,2026-10-03,04:35:12,happy
+Daniyal,2026-10-04,02:30:18,sad
 ```
 
 The system prevents the same person from being marked multiple times on the same day.
+
+The dashboard provides:
+
+* Today's attendance summary
+* Present and absent statistics
+* Attendance percentage
+* Attendance history
+* Date filtering
+* CSV export
+* Individual person attendance details
+* Attendance analytics
+* Emotion analytics
+
+The application uses the **Pakistan timezone (`Asia/Karachi`)** for attendance dates and times.
+
+---
 
 ## How It Works
 
@@ -144,32 +208,36 @@ The system follows this pipeline:
 ```text
 Webcam
    ↓
-Face Detection
+Face Detection (YuNet)
    ↓
-Face Alignment
-   ↓
-Face Recognition
+Face Recognition (SFace)
    ↓
 Identify Person
    ↓
-Emotion Detection
+Emotion Detection (MobileFaceNet)
    ↓
 Attendance Recording
    ↓
-CSV File
+CSV Storage
+   ↓
+Web Dashboard & Analytics
 ```
 
 ### Face Detection
 
-YuNet detects faces from the webcam frame.
+**YuNet** detects faces from the live webcam feed.
 
 ### Face Recognition
 
-SFace generates a face embedding and compares it with the registered face embeddings.
+**SFace** generates a face representation and compares it with registered face data from the `known_faces` folder.
+
+If a matching registered face is found, the person's name is identified.
 
 ### Emotion Detection
 
-The facial expression model estimates one of the following emotions:
+**MobileFaceNet** analyzes the recognized face and estimates the detected facial emotion.
+
+The system supports emotions such as:
 
 ```text
 Angry
@@ -183,28 +251,70 @@ Neutral
 
 ### Attendance
 
-If the person is successfully recognized, their attendance is stored in the CSV file.
+When a registered person is successfully recognized, the system records:
+
+* Person's name
+* Date
+* Time
+* Detected emotion
+
+The attendance record is saved in:
+
+```text
+attendance/attendance_emotion.csv
+```
+
+The system prevents the same person from being marked multiple times on the same day.
+
+### Web Dashboard
+
+The Flask dashboard provides:
+
+* Live camera feed
+* Recognition result
+* Detected emotion
+* Attendance summary
+* Attendance history
+* People management
+* Person details
+* CSV export
+* Attendance analytics
+* Emotion analytics
+
+---
 
 ## Important Note
 
-Emotion detection is an AI-based **estimate** and should not be considered a guaranteed measurement of a person's actual emotional state.
+The system requires the ONNX models to be present inside the `models` folder.
+
+Registered face images should be placed inside the `known_faces` folder.
+
+For better recognition accuracy, use clear and properly lit face images.
+
+The system is designed for local development and demonstration purposes. Additional security and deployment configuration should be added before using it in a production environment.
+
+---
 
 ## Future Improvements
 
 Possible future improvements include:
 
-* Web-based dashboard
-* Database integration
-* Better attendance reports
-* Multiple images per person
-* Admin panel
-* User interface
+* Cloud database integration
+* Email notifications
+* WhatsApp notifications
+* Automated daily attendance reports
+* More advanced emotion recognition
+* Multi-camera support
+* Role-based user authentication
 * Cloud deployment
-* Real-time attendance dashboard
-* Improved emotion classification
+* AI-powered attendance insights
+* Employee management features
+* REST API integration
+
+---
 
 ## Project Goal
 
-This project demonstrates the practical use of computer vision and deep learning models to build a real-world AI application combining:
+The goal of this project is to combine **Face Recognition, Emotion Detection, and Attendance Automation** into a practical AI application.
 
-**Face Detection + Face Recognition + Emotion Detection + Attendance Automation**
+It demonstrates how computer vision and deep learning models can be integrated with a Flask web application to create a real-world AI automation system.

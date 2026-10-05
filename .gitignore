@@ -1,22 +1,40 @@
 # Python cache
-__pycache__/
+
+**pycache**/
 *.py[cod]
 
 # Virtual environments
+
 .venv/
 venv/
 env/
 
 # VS Code
+
 .vscode/
 
 # Jupyter
+
 .ipynb_checkpoints/
 
 # OS files
+
 .DS_Store
 Thumbs.db
 
 # Private data
-known_faces/
+
 attendance/
+
+# Environment variables
+
+.env
+.env.*
+
+# Local Python files
+
+*.log
+*.db
+
+# Private face images
+known_faces/
