@@ -32,6 +32,25 @@ The system recognizes registered people through a webcam, detects their emotions
 
 ---
 
+## Screenshots
+
+### Login Page
+
+![Login Page](screenshots/login.png)
+
+### Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### Attendance History
+
+![Attendance History](screenshots/attendance.png)
+
+### People Management
+
+![People Management](screenshots/people.png)
+
+
 ## Technologies Used
 
 * Python
